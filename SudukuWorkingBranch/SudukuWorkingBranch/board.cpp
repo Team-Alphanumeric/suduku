@@ -19,6 +19,55 @@ board::board(int sqSize)
 void board::clear()
 {
 }
+/*
+* setRowNums - set the available numbers for each row, should be a Matrix of size 9 by 9
+with a boolean indicating whether a number is in that row or not. For example, rowNum[2][5]
+would return true if their is not a 5 in row 5 of the suduku, or false if there was a 5
+in row 5 of the suduku
+*/
+void board::setRowNums()
+{
+	//for each row starting from 1 and going to 9 iterate through each row of the rowCheck matrix
+	for (int i = 0; i < BoardSize; i++)
+	{
+		//in each row, iterate through all the cells and if a number is contained in that row then 
+		//set the corresponding number false 
+		for (int j = 0; j < BoardSize; j++)
+		{
+			//if the element in the current cell is not a dot, then set the corresponding number false
+			//since the numbers in the matrix are direct-addresed to its corresponding number, the number
+			//5 is location 5 in the element of the matrix
+			(getCell(i, j) != '.') ? (rowCheck[i][getCell(i, j)] = false) : false;
+		}
+	}
+}
+/*
+ *setColumnNUms does the exact same function as setRowNums except it will be setting the numbers that are
+ available for each column
+*/
+void board::setColumnNums()
+{
+	//for each column starting from 1 and going to BoardSize iterate through each column of the column Checks matrix
+	for (int i = 0; i < BoardSize; i++)
+	{
+		//in each Column, iterate through all the cells and if a number is contained in that column then 
+		//set the corresponding number false 
+		for (int j = 0; j < BoardSize; j++)
+		{
+			//if the element in the current cell is not a dot, then set the corresponding number false
+			//since the numbers in the matrix are direct-addresed to its corresponding number, the number
+			//5 is location 5 in the element of the matrix
+			(getCell(j, i) != '.') ? (columnCheck[i][getCell(j, i)] = false) : false;
+		}
+	}
+}
+/*
+* setSquareNums does the same thing as setRowNums except it sets which numbers are still available for each square
+*/
+void board::setSquareNums()
+{
+
+}
 
 void board::initialize(ifstream &fin)
 // Read a Sudoku board from the input file.
@@ -108,34 +157,3 @@ void board::print()
 	cout << endl;
 }
 
-int main()
-{
-	ifstream fin;
-
-	// Read the sample grid from the file.
-	string fileName = "sudoku.txt";
-
-	fin.open(fileName.c_str());
-	if (!fin)
-	{
-		cerr << "Cannot open " << fileName << endl;
-		exit(1);
-	}
-
-	try
-	{
-		board b1(SquareSize);
-
-		while (fin && fin.peek() != 'Z')
-		{
-			b1.initialize(fin);
-			b1.print();
-			b1.printConflicts();
-		}
-	}
-	catch (indexRangeError &ex)
-	{
-		cout << ex.what() << endl;
-		exit(1);
-	}
-}

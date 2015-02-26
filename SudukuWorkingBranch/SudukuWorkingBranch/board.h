@@ -34,6 +34,9 @@ public:
 	void print();
 	bool isBlank(int, int);
 	ValueType getCell(int, int);
+	void setRowNums();
+	void setColumnNums();
+	void setSquareNums();
 	board();
 	~board();
 
@@ -43,5 +46,8 @@ private:
 	// dimension.  I.e. they are each (BoardSize+1) X (BoardSize+1)
 
 	matrix<ValueType> value;
+	matrix<bool> rowCheck; // stores available numbers for each cells row.
+	matrix<bool> columnCheck; // stores available numbers for each cells column 
+	matrix<bool> squareCheck; // stores available numbers for each square 
 };
 
