@@ -14,6 +14,7 @@ int main()
 	if (!fin)
 	{
 		cerr << "Cannot open " << fileName << endl;
+		system("pause");
 		exit(1);
 	}
 
@@ -22,16 +23,17 @@ int main()
 		board b1(SquareSize);
 
 		while (fin && fin.peek() != 'Z')
-		{
-			b1.initialize(fin);
-			b1.print();
-			b1.printConflicts(); //print conflicts currently not working
+		{							
+			b1.initialize(fin);			
+			b1.print();			
+			b1.printConflicts();  
+			system("pause");
 		}
 	}
 	catch (indexRangeError &ex)
 	{
 		cout << ex.what() << endl;
+		system("puase");
 		exit(1);
 	}
 }
-//test line

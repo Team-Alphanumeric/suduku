@@ -22,21 +22,29 @@ const int BoardSize = SquareSize * SquareSize;
 const int MinValue = 1;
 const int MaxValue = 9;
 
-int numSolutions = 0;
+//int numSolutions = 0;
+/*****
+* Note that the Board assumes that the board matrix goes from 
+* 1-9 not 0-8 so value[0][0] will be an error, the first element
+* should be value [1][1]
+*****/
 
 class board
 	// Stores the entire Sudoku board
 {
 public:
 	board(int);
+	void setCell(int i, int j, int newNum);
 	void clear();
 	void initialize(ifstream &fin);
 	void print();
 	bool isBlank(int, int);
 	ValueType getCell(int, int);
+	int squareNumber(int i, int j);
 	void setRowNums();
 	void setColumnNums();
 	void setSquareNums();
+	void printConflicts();
 	board();
 	~board();
 
