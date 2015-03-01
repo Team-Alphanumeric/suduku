@@ -32,8 +32,9 @@ int main()
 			b1.setCell(1, 2, 3);
 			system("pause");
 			b1.print();
-			b1.clearCell(1, 2);			
+			b1.clearCell(1, 2);				
 			b1.print();
+			b1.boardSolved();
 			system("pause");
 		}
 	}

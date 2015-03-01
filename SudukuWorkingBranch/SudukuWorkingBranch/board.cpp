@@ -70,7 +70,9 @@ void board::printConflicts()
 *  takes in a position and a number and sees if there is a conflict at that position
 ***/
 bool board::numberFit(const int i, const int j, const int testNum)
-{
+{	
+	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
+		throw rangeError("bad value in setCell");
 	return value[i][j] == Blank && rowCheck[i][testNum] && columnCheck[j][testNum] && squareCheck[squareNumber(i, j)][testNum];
 }
 
@@ -98,7 +100,7 @@ would return true if their is not a 5 in row 5 of the suduku, or false if there 
 in row 5 of the suduku
 */
 void board::setRowNums()
-{
+{	
 	//for each row starting from 1 and going to 9 iterate through each row of the rowCheck matrix
 	for (int i = 1; i <= BoardSize; i++)
 	{
@@ -118,7 +120,7 @@ void board::setRowNums()
  available for each column
 */
 void board::setColumnNums()
-{
+{	
 	//for each column starting from 1 and going to BoardSize iterate through each column of the column Checks matrix
 	for (int i = 1; i <= BoardSize; i++)
 	{
@@ -159,6 +161,8 @@ void board::setSquareNums()
 **/
 void board::setCell(const int i, const int j, const int newNum)
 {
+	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
+		throw rangeError("bad value in setCell");
 	//cout << "Testing position " << i << "," << j << " and for " << newNum << ".\n";
 	if (newNum == Blank)
 	{
@@ -182,21 +186,33 @@ void board::setCell(const int i, const int j, const int newNum)
 }
 
 /****
-* This 
+* clearCell takes in a position and sets the value back to one.
+This assumes that the number set in the position does not conflict with any other value
+in that row, column and squrae. Therefore, the old number is set to true in all of the conflict
+vectors and then the data is set back to blank.
 ****/
 void board::clearCell(const int i, const int j)
 {
-	
+	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
+		throw rangeError("bad value in setCell");
 	if (value[i][j] != Blank)
-	{
-		int currentNum = value[i][j];
+	{		
+		rowCheck[i][value[i][j]] = true;
+		columnCheck[j][value[i][j]] = true;
+		squareCheck[squareNumber(i, j)][value[i][j]] = true;
 		value[i][j] = Blank;
-		rowCheck[i][currentNum] = true;
-		columnCheck[j][currentNum] = true;
-		squareCheck[squareNumber(i, j)][currentNum] = true;
 	}
 }
 
+/****
+* initialize - initailizes the board to the input file
+First it clears the board to all 0's and then sets the 
+positions in the data vector to the values from the
+input file. 0's is read as -1's in the data vector
+Also, it reads in the board from 1-9 not 0-8. After
+setting the board it updates the conflict vectors to the 
+starting values
+****/
 void board::initialize(ifstream &fin)
 // Read a Sudoku board from the input file.
 {	
@@ -225,6 +241,30 @@ void board::initialize(ifstream &fin)
 	setSquareNums();	
 }
 
+/****
+* board solved- checks to see if the board is fully solved.
+ It does that by checking the conflict vectors to see if they are all false. Because if there is a conflict
+ vector with a true value still, then that means that a number can still be placed into the board and thus
+ the board is not solved
+****/
+void board::boardSolved()
+{
+	bool result = false;
+	for (int i = 0; i < 10; i++)
+	{
+		for (int j = 0; j < 10; j++)
+		{
+			result = result || rowCheck[i][j] || squareCheck[i][j] || columnCheck[i][j];			
+		}
+	}	
+	(result) ? (cout << "The game is not solved." << endl) : (cout << "The game is solved");
+
+}
+
+/****
+* SquareNumber takes in the position and determines
+which square that position is in and returns the square number
+****/
 int board::squareNumber(int i, int j)
 // Return the square number of cell i,j (counting from left to right,
 // top to bottom.  Note that i and j each go from 1 to BoardSize
@@ -235,6 +275,10 @@ int board::squareNumber(int i, int j)
 	return SquareSize * ((i - 1) / SquareSize) + (j - 1) / SquareSize + 1;
 }
 
+
+/***
+* overloaded operator to output a line of the sudoku
+***/
 ostream &operator<<(ostream &ostr, vector<int> &v)
 // Overloaded output operator for vector class.
 {
@@ -244,6 +288,11 @@ ostream &operator<<(ostream &ostr, vector<int> &v)
 	return ostr;
 }
 
+
+/****
+* getCell -it given a position and returns the current position
+if the position is out of range for the board, it returns out of range
+****/
 ValueType board::getCell(int i, int j)
 // Returns the value stored in a cell.  Throws an exception
 // if bad values are passed.
@@ -254,6 +303,9 @@ ValueType board::getCell(int i, int j)
 		throw rangeError("bad value in getCell");
 }
 
+/****
+* isBlank determines is a given cell is blank or not
+****/
 bool board::isBlank(int i, int j)
 // Returns true if cell i,j is blank, and false otherwise.
 {
