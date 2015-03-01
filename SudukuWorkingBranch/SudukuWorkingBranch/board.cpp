@@ -166,7 +166,8 @@ void board::setCell(const int i, const int j, const int newNum)
 		value[i][j] = newNum;
 		rowCheck[i][newNum] = false;
 		columnCheck[j][newNum] = false;
-		squareCheck[squareNumber(i, j)][newNum];
+		squareCheck[squareNumber(i, j)][newNum] = false;
+		cout << "Square number " << squareNumber(i,j) << endl;
 		printConflicts();
 	}
 	else
