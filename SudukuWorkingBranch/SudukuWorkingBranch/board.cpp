@@ -65,6 +65,13 @@ void board::printConflicts()
 		cout << endl;
 	}
 }
+/***
+*  takes in a position and a number and sees if there is a conflict at that position
+***/
+bool board::numberFit(int i, int j, int testNum)
+{
+	return rowCheck[i][testNum] && columnCheck[j][testNum] && squareCheck[squareNumber(i, j)][testNum];
+}
 
 void board::clear()
 {
@@ -76,7 +83,7 @@ void board::clear()
 		{
 			//every possible value is set back to true because it is
 			//a blank board so every number can go in every position.
-			setCell(i, j, Blank);
+			setCellInit(i, j, Blank);
 			rowCheck[i][j] = true;
 			columnCheck[i][j] = true;
 			squareCheck[i][j] = true;
@@ -144,9 +151,29 @@ void board::setSquareNums()
 	}	
 }
 
-void board::setCell(int i, int j, int newNum)
+void board::setCellInit(const int i, const int j, const int newNum)
 {
 	value[i][j] = newNum;
+}
+
+void board::setCell(const int i, const int j, const int newNum)
+{
+	cout << "Testing position " << i << "," << j << " and for " << newNum << ".\n";
+	if (numberFit(i, j, newNum))
+	{
+		cout << "Num does not have a conflict " << endl;
+		cout << "Adding " << newNum << " to the board at position " << i << "," << j << ".\n";
+		value[i][j] = newNum;
+		rowCheck[i][newNum] = false;
+		columnCheck[j][newNum] = false;
+		squareCheck[squareNumber(i, j)][newNum];
+		printConflicts();
+	}
+	else
+	{
+		cout << "Num has a conflict" << endl;
+	}
+	
 }
 
 void board::initialize(ifstream &fin)
@@ -163,13 +190,13 @@ void board::initialize(ifstream &fin)
 		// If the read char is not Blank
 		if (ch != '.')
 		{
-			setCell(i, j, ch - '0');   // Convert char to int
+			setCellInit(i, j, ch - '0');   // Convert char to int
 		}
 		//if the value is a dot then put a -1 in its data value
 		// Blank = -1
 		else
 		{
-			setCell(i, j, Blank);
+			setCellInit(i, j, Blank);
 		}
 	}	
 	setRowNums();

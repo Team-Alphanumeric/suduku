@@ -34,7 +34,8 @@ class board
 {
 public:
 	board(int);
-	void setCell(int i, int j, int newNum);
+	void setCellInit(const int i, const int j, const int newNum);
+	void setCell(const int i,const int j,const int newNum);
 	void clear();
 	void initialize(ifstream &fin);
 	void print();
@@ -44,6 +45,7 @@ public:
 	void setRowNums();
 	void setColumnNums();
 	void setSquareNums();
+	bool numberFit(int i, int j, int testNum);
 	void printConflicts();
 	board();
 	~board();

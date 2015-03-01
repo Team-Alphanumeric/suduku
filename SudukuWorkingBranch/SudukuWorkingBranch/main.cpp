@@ -27,6 +27,12 @@ int main()
 			b1.initialize(fin);			
 			b1.print();			
 			b1.printConflicts();  
+			b1.numberFit(1, 2, 3);
+			cout << "Does 3 fit in 1,2? " << b1.numberFit(1, 2, 3) << endl;
+			b1.setCell(1, 2, 3);		
+			cout << "Does 7 fit in 5,4? " << b1.numberFit(5, 4, 7) << endl;
+			b1.setCell(5, 4, 7);
+			b1.print();
 			system("pause");
 		}
 	}
