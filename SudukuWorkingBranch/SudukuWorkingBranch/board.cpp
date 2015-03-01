@@ -69,11 +69,11 @@ void board::printConflicts()
 /***
 *  takes in a position and a number and sees if there is a conflict at that position
 ***/
-bool board::numberFit(const int i, const int j, const int testNum)
+bool board::numberFit(const int i, const int j, const ValueType testElement)
 {	
 	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
 		throw rangeError("bad value in setCell");
-	return value[i][j] == Blank && rowCheck[i][testNum] && columnCheck[j][testNum] && squareCheck[squareNumber(i, j)][testNum];
+	return value[i][j] == Blank && rowCheck[i][testElement] && columnCheck[j][testElement] && squareCheck[squareNumber(i, j)][testElement];
 }
 
 void board::clear()
@@ -159,24 +159,24 @@ void board::setSquareNums()
  as in intiaizing the board, it sets the position to blank. This covers all cases, where a number needs to be added to a board, 
  either through trying to place a new number to solve the board or to initalize the board to blanks.
 **/
-void board::setCell(const int i, const int j, const int newNum)
+void board::setCell(const int i, const int j, const ValueType newElement)
 {
 	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
 		throw rangeError("bad value in setCell");
 	//cout << "Testing position " << i << "," << j << " and for " << newNum << ".\n";
-	if (newNum == Blank)
+	if (newElement == Blank)
 	{
 		value[i][j] = Blank;
 
 	}
-	else if (numberFit(i, j, newNum))
+	else if (numberFit(i, j, newElement))
 	{
 		//cout << "Num does not have a conflict " << endl;
 		//cout << "Adding " << newNum << " to the board at position " << i << "," << j << ".\n";
-		value[i][j] = newNum;
-		rowCheck[i][newNum] = false;
-		columnCheck[j][newNum] = false;
-		squareCheck[squareNumber(i, j)][newNum] = false;
+		value[i][j] = newElement;
+		rowCheck[i][newElement] = false;
+		columnCheck[j][newElement] = false;
+		squareCheck[squareNumber(i, j)][newElement] = false;
 	}
 	else
 	{

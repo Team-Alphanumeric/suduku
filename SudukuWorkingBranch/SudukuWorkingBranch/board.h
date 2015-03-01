@@ -33,9 +33,8 @@ class board
 	// Stores the entire Sudoku board
 {
 public:
-	board(int);
-	void setCellInit(const int i, const int j, const int newNum);
-	void setCell(const int i,const int j,const int newNum);
+	board(int);	
+	void setCell(const int i,const int j,const ValueType newElement);
 	void clearCell(const int i, const int j);
 	void clear();
 	void initialize(ifstream &fin);
@@ -46,7 +45,7 @@ public:
 	void setRowNums();
 	void setColumnNums();
 	void setSquareNums();
-	bool numberFit(const int i, const int j, const int testNum);
+	bool numberFit(const int i, const int j, const ValueType testElement);
 	void printConflicts();
 	void boardSolved();
 	board();
