@@ -36,6 +36,7 @@ public:
 	board(int);
 	void setCellInit(const int i, const int j, const int newNum);
 	void setCell(const int i,const int j,const int newNum);
+	void clearCell(const int i, const int j);
 	void clear();
 	void initialize(ifstream &fin);
 	void print();
@@ -45,8 +46,9 @@ public:
 	void setRowNums();
 	void setColumnNums();
 	void setSquareNums();
-	bool numberFit(int i, int j, int testNum);
+	bool numberFit(const int i, const int j, const int testNum);
 	void printConflicts();
+	void boardSolved();
 	board();
 	~board();
 
