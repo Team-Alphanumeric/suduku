@@ -10,14 +10,12 @@ board::~board()
 {
 }
 
-board::board(int sqSize)
-: value(BoardSize + 1, BoardSize + 1)
+board::board(int sqSize) : value(BoardSize + 1, BoardSize + 1)
 // Board constructor
 {
 	rowCheck.resize(10,10);
 	columnCheck.resize(10,10);
 	squareCheck.resize(10,10);
-	value.resize(10, 10); 
 }
 
 /****
@@ -72,8 +70,8 @@ void board::printConflicts()
 bool board::numberFit(const int i, const int j, const ValueType testElement)
 {	
 	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
-		throw rangeError("bad value in setCell");
-	return value[i][j] == Blank && rowCheck[i][testElement] && columnCheck[j][testElement] && squareCheck[squareNumber(i, j)][testElement];
+	{	throw rangeError("In board::numberFit: index out of range");	}
+	return (value[i][j] == Blank) && rowCheck[i][testElement] && columnCheck[j][testElement] && squareCheck[squareNumber(i, j)][testElement];
 }
 
 void board::clear()
@@ -104,14 +102,14 @@ void board::setRowNums()
 	//for each row starting from 1 and going to 9 iterate through each row of the rowCheck matrix
 	for (int i = 1; i <= BoardSize; i++)
 	{
-		//in each row, iterate through all the cells and if a number is contained in that row then 
+		//in each row, iterate through all the columns and if a number is contained in that row then 
 		//set the corresponding number false 
 		for (int j = 1; j <= BoardSize; j++)
 		{
 			//if the element in the current cell is not a dot, then set the corresponding number false
 			//since the numbers in the matrix are direct-addresed to its corresponding number, the number
 			//5 is location 5 in the element of the matrix
-			(getCell(i, j) != Blank) ? (rowCheck[i][getCell(i, j)] = false) : true;
+			if (getCell(i, j) != Blank) { rowCheck[i][getCell(i, j)] = false;  }
 		}
 	}
 }
@@ -131,7 +129,7 @@ void board::setColumnNums()
 			//if the element in the current cell is not a dot, then set the corresponding number false
 			//since the numbers in the matrix are direct-addresed to its corresponding number, the number
 			//5 is location 5 in the element of the matrix
-			(getCell(j, i) != Blank) ? (columnCheck[i][getCell(j, i)] = false) : false;
+		if(getCell(j, i) != Blank) { columnCheck[i][getCell(j, i)] = false;	}
 		}
 	}	
 }
@@ -149,7 +147,7 @@ void board::setSquareNums()
 			// if the location that is currently being checked is not a dot, then find out which square it is in
 			// with the squareNumber function and set that corresponding value to false. This will indicate
 			// which numbers are still currently available in each square.
-			(getCell(i, j) != Blank) ? (squareCheck[squareNumber(i,j)][getCell(i, j)] = false) : false;
+			if (getCell(i, j) != Blank) { squareCheck[squareNumber(i, j)][getCell(i, j)] = false; }
 		}
 	}	
 }
@@ -162,25 +160,21 @@ void board::setSquareNums()
 void board::setCell(const int i, const int j, const ValueType newElement)
 {
 	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
-		throw rangeError("bad value in setCell");
-	//cout << "Testing position " << i << "," << j << " and for " << newNum << ".\n";
-	if (newElement == Blank)
+	{	throw rangeError("In board::setCell: invalid index");	}
+	if (newElement == Blank) // always store a blank element
 	{
 		value[i][j] = Blank;
-
 	}
-	else if (numberFit(i, j, newElement))
+	else if (numberFit(i, j, newElement)) // place the new element if there aren't conflicts
 	{
-		//cout << "Num does not have a conflict " << endl;
-		//cout << "Adding " << newNum << " to the board at position " << i << "," << j << ".\n";
 		value[i][j] = newElement;
 		rowCheck[i][newElement] = false;
 		columnCheck[j][newElement] = false;
 		squareCheck[squareNumber(i, j)][newElement] = false;
 	}
-	else
+	else // send a passive-agressive message if there is a conflict
 	{
-		cout << "Num has a conflict" << endl;
+		std::cout << "Warning! Invalid placement: " << newElement << " was not placed in position ("<<i<<","<<j<<")!" << endl;
 	}
 	
 }
@@ -194,7 +188,7 @@ vectors and then the data is set back to blank.
 void board::clearCell(const int i, const int j)
 {
 	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
-		throw rangeError("bad value in setCell");
+	{	throw rangeError("In board::setCell: invalid index");	}
 	if (value[i][j] != Blank)
 	{		
 		rowCheck[i][value[i][j]] = true;
@@ -224,17 +218,18 @@ void board::initialize(ifstream &fin)
 	{
 		fin >> ch;
 
-		// If the read char is not Blank
-		if (ch != '.')
-		{
-			setCell(i, j, ch - '0');   // Convert char to int
-		}
 		//if the value is a dot then put a -1 in its data value
 		// Blank = -1
-		else
+		if (ch == '.')
 		{
 			setCell(i, j, Blank);
 		}
+		// If the read char is not Blank
+		else if (ch != '.')
+		{
+			setCell(i, j, ch - '0');   // Convert char to int
+		}
+		else { throw invalid_argument("In Board::initialize(): Invalid sudoku puzzle with values outside ValueType"); }
 	}	
 	setRowNums();
 	setColumnNums();
@@ -250,14 +245,14 @@ void board::initialize(ifstream &fin)
 void board::boardSolved()
 {
 	bool result = false;
-	for (int i = 0; i < 10; i++)
+	for (int i = 1; i < 10; i++)
 	{
-		for (int j = 0; j < 10; j++)
+		for (int j = 1; j < 10; j++)
 		{
 			result = result || rowCheck[i][j] || squareCheck[i][j] || columnCheck[i][j];			
 		}
 	}	
-	(result) ? (cout << "The game is not solved." << endl) : (cout << "The game is solved");
+	std::cout << (	(result) ? ("The game is not solved.") : ("The game is solved")	) << endl;
 
 }
 
@@ -297,10 +292,10 @@ ValueType board::getCell(int i, int j)
 // Returns the value stored in a cell.  Throws an exception
 // if bad values are passed.
 {
-	if (i >= 1 && i <= BoardSize && j >= 1 && j <= BoardSize)
-		return value[i][j];
-	else
-		throw rangeError("bad value in getCell");
+	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
+	{throw rangeError("In board::setCell: invalid index");}
+	else 
+	{ return value[i][j]; }
 }
 
 /****
@@ -310,7 +305,7 @@ bool board::isBlank(int i, int j)
 // Returns true if cell i,j is blank, and false otherwise.
 {
 	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
-		throw rangeError("bad value in setCell");
+	{	throw rangeError("In board::setCell: invalid index");	}
 	//since a value of -1 in the data value means blank, when
 	//the cell returns a value of -1, then the function returns true sicne
 	//it is blank, if the cell does not equal -1, then it returns false
@@ -325,29 +320,29 @@ void board::print()
 	{
 		if ((i - 1) % SquareSize == 0)
 		{
-			cout << " -";
+			std::cout << " -";
 			for (int j = 1; j <= BoardSize; j++)
-				cout << "---";
-			cout << "-";
-			cout << endl;
+				std::cout << "---";
+			std::cout << "-";
+			std::cout << endl;
 		}
 		for (int j = 1; j <= BoardSize; j++)
 		{
 			if ((j - 1) % SquareSize == 0)
-				cout << "|";
+				std::cout << "|";
 			if (!isBlank(i, j))
-				cout << " " << getCell(i, j) << " ";
+				std::cout << " " << getCell(i, j) << " ";
 			else
-				cout << "   ";
+				std::cout << "   ";
 		}
-		cout << "|";
-		cout << endl;
+		std::cout << "|";
+		std::cout << endl;
 	}
 
-	cout << " -";
+	std::cout << " -";
 	for (int j = 1; j <= BoardSize; j++)
-		cout << "---";
-	cout << "-";
-	cout << endl;
+		std::cout << "---";
+	std::cout << "-";
+	std::cout << endl;
 }
 

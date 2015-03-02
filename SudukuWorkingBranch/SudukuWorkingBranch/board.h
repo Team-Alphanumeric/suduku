@@ -4,6 +4,7 @@
 #include <limits.h>
 #include "d_matrix.h"
 #include "d_except.h"
+#include <exception>
 #include <list>
 #include <fstream>
 
@@ -56,9 +57,9 @@ private:
 	// The following matrices go from 1 to BoardSize in each
 	// dimension.  I.e. they are each (BoardSize+1) X (BoardSize+1)
 
-	matrix<ValueType> value;
-	matrix<bool> rowCheck; // stores available numbers for each cells row.
-	matrix<bool> columnCheck; // stores available numbers for each cells column 
-	matrix<bool> squareCheck; // stores available numbers for each square 
+	matrix<ValueType> value; // holds the sudoku matrix
+	matrix<bool> rowCheck; // stores available numbers for each cells row: [row][ValueType] 
+	matrix<bool> columnCheck; // stores available numbers for each cells column: [column][ValueType]
+	matrix<bool> squareCheck; // stores available numbers for each square: [square][ValueType]
 };
 
