@@ -46,6 +46,7 @@ public:
 	int squareNumber(int i, int j);
 	void setRowNums();
 	void setColumnNums();
+	void setOneConflict();
 	void setSquareNums();
 	bool numberFit(const int i, const int j, const ValueType testElement);
 	void printConflicts();
@@ -60,8 +61,8 @@ private:
 	// dimension.  I.e. they are each (BoardSize+1) X (BoardSize+1)
 
 	matrix<ValueType> value; // holds the sudoku matrix
-	matrix<bool> rowCheck; // stores available numbers for each cells row: [row][ValueType] 
-	matrix<bool> columnCheck; // stores available numbers for each cells column: [column][ValueType]
-	matrix<bool> squareCheck; // stores available numbers for each square: [square][ValueType]
+	matrix<int> rowCheck; // stores available numbers for each cells row: [row][ValueType] 
+	matrix<int> columnCheck; // stores available numbers for each cells column: [column][ValueType]
+	matrix<int> squareCheck; // stores available numbers for each square: [square][ValueType]
 };
 

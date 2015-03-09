@@ -373,6 +373,7 @@ bool board::solveBoard(const int i, const int j)
 			if (numberFit(i, j, l))
 			{
 				setCell(i, j, l);
+
 				//system("pause");
 				//print();
 				cout << "Number of Iterations " << numIterations << endl;
@@ -425,7 +426,36 @@ int board::numConflict(const int i, const int j)
 	int conflictNum = 0;
 	for (int l = 1; l < 10; l++)
 	{
-		(rowCheck[i][l] && rowCheck[j][l] && squareCheck[squareNumber(i, j)][l]) ? conflictNum++ : conflictNum;
+		(rowCheck[i][l] && rowCheck[j][l] && squareCheck[squareNumber(i, j)][l]) ? (conflictNum++, conflictData = l) : conflictNum;
 	}
 	return conflictNum;
+}
+// there is only one conflict in this cell then set it to the number 2 which indicates that the number
+// was set because of the fact that there was only one conflict in the cell, so this allows the number to be easily changed back to 
+// blank if the current pattern of numbers is found not to be the solution,
+// Not sure how to indicate which iteration that the number was set so that it sets it self back correctly if the current pattern of numbers
+// is not found to be correct. Need to somehow associate when a particular Cell was set with this function, so that when the function recurses back
+// to a point where that Cell may have other conflicts again, it correctly keeps updates its conflicts
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! not working.....!!!! need to do other things.....
+void board::setOneConflict()
+{
+	int numOfConflict = 0;
+	ValueType conflictData = 0;
+	for (int i = 1; i < 10; i++)
+	{
+		for (int j = 1; j < 10; j++)
+		{
+			if (numConflict(i, j) == 1)
+			{
+				for (int k = 1; k < 10; k++)
+				{
+					if (rowCheck[i][k])
+					{
+						conflictData = k;
+					}
+				}
+				setCell(i, j, conflictData);
+			}
+		}
+	}
 }
