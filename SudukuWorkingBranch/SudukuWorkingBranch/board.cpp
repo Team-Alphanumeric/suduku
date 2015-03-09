@@ -242,7 +242,7 @@ void board::initialize(ifstream &fin)
  vector with a true value still, then that means that a number can still be placed into the board and thus
  the board is not solved
 ****/
-void board::boardSolved()
+bool board::boardSolved()
 {
 	bool result = false;
 	for (int i = 1; i < 10; i++)
@@ -253,7 +253,7 @@ void board::boardSolved()
 		}
 	}	
 	std::cout << (	(result) ? ("The game is not solved.") : ("The game is solved")	) << endl;
-
+	return result;
 }
 
 /****
@@ -346,3 +346,86 @@ void board::print()
 	std::cout << endl;
 }
 
+bool board::solveBoard(const int i, const int j)
+{
+	static int numIterations = 0;
+	numIterations++;
+	//if the number fits
+	//set the cell with the number that fits
+	//if that number is in position 9,9 then the board is solved
+	//else recursively call this funciton to solve the next element on the board
+	// with (i % 9) + 1 to allow the row to wrap for each column
+	// for the return value of the call if it is true then keep the change else if false then
+	// undue the change and change the conflict variable
+	// Only attempt to test and place a number if the Cell is blank
+	if (isBlank(i, j))
+	{
+		//test every possible element that could go into the Cell
+		for (int l = 1; l < 10; l ++)
+		{
+			//if the current number fits into the cell place the value into that cell, 
+			// The function setCell automatically sets the conflict variables
+			// then after the new number is set, call the solveBoard function recursively
+			// to set the next cell, if the value returned from the next cell is false, which
+			//indicates that there are no numbers that currently work with the next Cell, then clear that cell and 
+			// contiunue with placing elements at that cell from where the function left off. If the testing number gets to 9 and
+			// that number does not work, then return false so that the previous cell can remove its number and try the next
+			if (numberFit(i, j, l))
+			{
+				setCell(i, j, l);
+				//system("pause");
+				//print();
+				cout << "Number of Iterations " << numIterations << endl;
+				//cout << " i and j " << i << " " << j << endl;
+				if (i == 9 && j == 9)
+				{
+					return true;
+				}
+				(solveBoard((i % 9) + 1, ((i % 9) + 1 == 1) ? j + 1 : j)) ? true : (clearCell(i, j));
+				
+			}
+		}
+		//return false indicates that there are no numbers that will satisfy the current test numbers
+		return false;
+	}
+	// if the current cell is not blank then call solve Board on the next Cell and this cell
+	// returns whatever it is given
+	else
+	{
+		return solveBoard((i % 9) + 1, ((i % 9) + 1 == 1) ? j + 1 : j);
+
+	}
+	/*
+	for (int l = 1; l < 10; l++)
+	{
+		
+		if (numberFit(i, j, l))
+		{
+			cout << "Value of l " << l << endl;
+			setCell(i, j, l);
+			if (boardSolved())
+			{
+				return true;
+			}
+			else
+			{
+				(solveBoard((i % 9) + 1, j)) ? true : (clearCell(i, j), false);
+			}
+		}
+		
+	}
+	// if no numbers fit then return false
+	return false;
+	*/
+}
+// checks for the number of conflicts in a partciular Cell
+// all three arrays must contain that particular number as a conflict in order it to be a conflict for that Cell
+int board::numConflict(const int i, const int j)
+{
+	int conflictNum = 0;
+	for (int l = 1; l < 10; l++)
+	{
+		(rowCheck[i][l] && rowCheck[j][l] && squareCheck[squareNumber(i, j)][l]) ? conflictNum++ : conflictNum;
+	}
+	return conflictNum;
+}

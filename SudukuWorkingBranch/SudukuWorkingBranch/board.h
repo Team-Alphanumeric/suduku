@@ -38,6 +38,7 @@ public:
 	void setCell(const int i,const int j,const ValueType newElement);
 	void clearCell(const int i, const int j);
 	void clear();
+	int numConflict(const int i,const int j);
 	void initialize(ifstream &fin);
 	void print();
 	bool isBlank(int, int);
@@ -48,7 +49,8 @@ public:
 	void setSquareNums();
 	bool numberFit(const int i, const int j, const ValueType testElement);
 	void printConflicts();
-	void boardSolved();
+	bool solveBoard(const int i, const int j);
+	bool boardSolved();
 	board();
 	~board();
 

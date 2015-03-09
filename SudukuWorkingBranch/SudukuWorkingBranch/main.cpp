@@ -8,14 +8,14 @@ int main()
 	ifstream fin;
 
 	// Read the sample grid from the file.
-	string fileName = "sudoku.txt";
+	string fileName = "sudoku3.txt";
 
 	fin.open(fileName.c_str());
 	if (!fin)
 	{
 		cerr << "Cannot open " << fileName << endl;
-		//system("pause");
-		//exit(1);
+		system("pause");
+		return 0;		
 	}
 
 	try
@@ -25,9 +25,14 @@ int main()
 		while (fin && fin.peek() != 'Z')
 		{	
 			cout << "Testing a new Board! " << endl;
-			b1.initialize(fin);			
-			b1.print();			
-			cout << "\nPrinting conflicts: " << endl;
+			b1.initialize(fin);		
+			system("pause");
+			b1.print();		
+			system("pause");
+			bool finalResult = b1.solveBoard(1, 1);
+			cout << "The board was solved!!! " << finalResult << endl;
+			system("pause");
+			/* cout << "\nPrinting conflicts: " << endl;
 			b1.printConflicts();  
 			cout << "\nDoes 3 fit in 1,2? " << ((b1.numberFit(1, 2, 3)) ? "yes" : "no" ) << "." << endl;
 			b1.setCell(1, 2, 3);
@@ -36,7 +41,7 @@ int main()
 			cout << "\nClearing cell(1,2)" << endl;
 			b1.clearCell(1, 2);				
 			b1.print();
-			b1.boardSolved();
+			b1.boardSolved();*/
 			system("pause");
 		}
 	}
