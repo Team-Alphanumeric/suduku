@@ -52,6 +52,7 @@ public:
 	void printConflicts();
 	bool solveBoard(const int i, const int j);
 	bool boardSolved();
+	bool findEmpty(int &i, int &j);
 	board();
 	~board();
 
@@ -61,8 +62,11 @@ private:
 	// dimension.  I.e. they are each (BoardSize+1) X (BoardSize+1)
 
 	matrix<ValueType> value; // holds the sudoku matrix
-	matrix<int> rowCheck; // stores available numbers for each cells row: [row][ValueType] 
-	matrix<int> columnCheck; // stores available numbers for each cells column: [column][ValueType]
-	matrix<int> squareCheck; // stores available numbers for each square: [square][ValueType]
+	matrix<int> rowCheck; // stores count of each number place in each row: [row][ValueType] 
+	matrix<int> columnCheck; // stores count of each number place in each column: [column][ValueType]
+	matrix<int> squareCheck; // stores count of each number place in each square: [square][ValueType]
+	static int numSolveIterations; // number of iterations for the boardSolved function for a puzzle
 };
+
+numSolveIterations=0;
 

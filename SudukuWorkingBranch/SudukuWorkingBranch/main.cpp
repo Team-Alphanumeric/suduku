@@ -25,41 +25,38 @@ int main()
 		while (fin && fin.peek() != 'Z')
 		{	
 			cout << "Testing a new Board! " << endl;
+			
 			b1.initialize(fin);		
 			system("pause");
+			
 			b1.print();		
 			system("pause");
-			bool finalResult = b1.solveBoard(1, 1);
-			cout << "The board was solved!!! " << finalResult << endl;
-			system("pause");
-			/* cout << "\nPrinting conflicts: " << endl;
-			b1.printConflicts();  
-			cout << "\nDoes 3 fit in 1,2? " << ((b1.numberFit(1, 2, 3)) ? "yes" : "no" ) << "." << endl;
-			b1.setCell(1, 2, 3);
-			system("pause");
+			
+			bool finalResult = b1.solveBoard();
+			if(finalResult) { std::cout << "The board was solved!!! " << endl; }
+			else { std::cout << "Unable to solve this board :(" << endl; }
+			
+			std::cout << "Result:" << endl;
 			b1.print();
-			cout << "\nClearing cell(1,2)" << endl;
-			b1.clearCell(1, 2);				
-			b1.print();
-			b1.boardSolved();*/
+			
 			system("pause");
 		}
 	}
 	catch (indexRangeError &ex)
 	{
-		cout << "In main: " << ex.what() << endl;
-		//system("puase");
-		//exit(1);
+		std::cout << "In main: " << ex.what() << endl;
+	}
+	catch (rangeError &ex)
+	{
+		std::cout << "In main: " << ex.what() << endl;
 	}
 	catch (invalid_argument &ex)
 	{
-		cout << "In main: " << ex.what() << endl;
-		//system("puase");
-		//exit(1);
+		std::cout << "In main: " << ex.what() << endl;
 	}
 	catch (...)
 	{
-		cout << "In main: Unspecified exception" << endl;
+		std::cout << "In main: Unspecified exception" << endl;
 	}
 	return 0;
 }
