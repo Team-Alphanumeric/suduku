@@ -92,66 +92,7 @@ void board::clear()
 		}
 	}
 }
-/*
-* setRowNums - set the available numbers for each row, should be a Matrix of size 9 by 9
-with a boolean indicating whether a number is in that row or not. For example, rowNum[2][5]
-would return true if their is not a 5 in row 5 of the suduku, or false if there was a 5
-in row 5 of the suduku
-*/
-void board::setRowNums()
-{	
-	//for each row starting from 1 and going to 9 iterate through each row of the rowCheck matrix
-	for (int i = 1; i <= BoardSize; i++)
-	{
-		//in each row, iterate through all the columns and if a number is contained in that row then 
-		//set the corresponding number to a conflict 
-		for (int j = 1; j <= BoardSize; j++)
-		{
-			//if the element in the current cell is not a dot, then set the corresponding number false
-			//since the numbers in the matrix are direct-addresed to its corresponding number, the number
-			//5 is location 5 in the element of the matrix
-			if (getCell(i, j) != Blank) { rowCheck[i][getCell(i, j)]++;  }
-		}
-	}
-}
-/*
- *setColumnNUms does the exact same function as setRowNums except it will be setting the numbers that are
- available for each column
-*/
-void board::setColumnNums()
-{	
-	//for each column starting from 1 and going to BoardSize iterate through each column of the column Checks matrix
-	for (int i = 1; i <= BoardSize; i++)
-	{
-		//in each Column, iterate through all the cells and if a number is contained in that column then 
-		//set the corresponding number false 
-		for (int j = 1; j <= BoardSize; j++)
-		{
-			//if the element in the current cell is not a dot, then set the corresponding number false
-			//since the numbers in the matrix are direct-addresed to its corresponding number, the number
-			//5 is location 5 in the element of the matrix
-		if(getCell(j, i) != Blank) { columnCheck[i][getCell(j, i)]++;	}
-		}
-	}	
-}
-/*
-* setSquareNums does the same thing as setRowNums except it sets which numbers are still available for each square
-*/
-void board::setSquareNums()
-{
-	// iterate through every possible element starting from row 1 and iterating through each element in the row and then
-	// each column
-	for (int i = 1; i <= BoardSize; i++)
-	{
-		for (int j = 1; j <= BoardSize; j++)
-		{
-			// if the location that is currently being checked is not a dot, then find out which square it is in
-			// with the squareNumber function and set that corresponding value to false. This will indicate
-			// which numbers are still currently available in each square.
-			if (getCell(i, j) != Blank) { squareCheck[squareNumber(i, j)][getCell(i, j)]++; }
-		}
-	}	
-}
+
 /**
 * setCell- This attempts to set a particular cell to a number. If there is no conflicts, and the position is currently blank,
  then the number is added to the position. Also, this applies to the cause for making the board, because if the newNum is Blank, 
@@ -240,9 +181,6 @@ void board::initialize(ifstream &fin)
 		else { throw invalid_argument("In Board::initialize(): Invalid sudoku puzzle with values outside ValueType"); }
 	}
 	numSolveIterations = 0;
-	setRowNums();
-	setColumnNums();
-	setSquareNums();
 }
 
 /****
@@ -254,14 +192,22 @@ void board::initialize(ifstream &fin)
 bool board::boardSolved()
 {
 	bool result = true;
-	for (int i = 1; i < 10; i++)
+	for (int r = 1; r < 10; r++)
 	{
-		for (int j = 1; j < 10; j++)
+		for (int c = 1; c < 10; c++)
 		{
-			result = (result) && (rowCheck[i][j]==1) && (squareCheck[i][j]==1) && (columnCheck[i][j]==1);
+			for (int k = 1; k < 10; k++)
+			{
+				/*cout << "Value: " << k;
+				cout << "\tRow: " << rowCheck[r][k];
+				cout << "\tColumn: " << columnCheck[c][k];
+				cout << "\tSquare: " << squareCheck[squareNumber(r, c)][k] << endl;*/
+				result = (result) && (value[r][c] != Blank) && (rowCheck[r][k] == 1) && (squareCheck[squareNumber(r,c)][k] == 1) && (columnCheck[c][k] == 1);
+				//if (!result) { cout << "result false at position (" << r << "," << c << ")" << endl; system("pause"); }
+			}
 		}
 	}	
-	std::cout << (	(result) ? ("The game is not solved.") : ("The game is solved")	) << endl;
+	if (result) { std::cout << ("The game is not solved.") << endl; }
 	return result;
 }
 
@@ -377,12 +323,50 @@ bool board::solveBoard()
 }
 
 */
+bool board::solveBoard()
 
+{
+
+	// increment count of calls to this function for this puzzle
+	numSolveIterations++;
+	// find the best empty cell in the matrix: set to (r,c)
+	// if function returns false because no acceptable blank cell is found, check if the board is solved
+	// 'numberFit' should ensure only a valid number is placed
+	int r, c; if (!findMaxContradiction(r, c)) 
+	{ return boardSolved(); }
+	// otherwise, test all (reasonable) values for this empty cell
+	for (int i = 1; i <= 9; i++)
+	{
+		// find (reasonable) test value
+		int test = i; // for now we assume any test number is "reasonable"
+		// move on to next iteration in the for loop if the test number contradicts
+		if (!numberFit(r, c, test)) { continue; }
+		// input a test value into that cell
+		setCell(r, c, test);
+		// if the board can be solved with that test value, then it is solved using this year value (stop searching and return true)
+		if (solveBoard()){ return true; }
+		// otherwise, clear the cell to try with a different value
+		clearCell(r, c);
+	}
+	//cout << "Out of options " << endl;
+	// if still unsolved report unsolvable from here
+	return false;
+}
+
+
+/*
 // Solves the Board using a brute force method of testing values
 bool board::solveBoard()
 {
 	// increment count of calls to this function for this puzzle
 	numSolveIterations++;
+	cout << "Num of iterations " << numSolveIterations << ".\n";
+	if (numSolveIterations > 250000)
+	{
+		print();
+		system("pause");
+	}
+	
 	
 	// find the first empty cell in the matrix: set to (r,c)
 	// if no empty cells are found, double check if the board is solved
@@ -427,123 +411,44 @@ bool board::findEmpty(int &i, int &j)
 	}
 	// base case: no blank cell found
 	return false;
-}
-
-/*
-bool board::solveBoard(const int i, const int j)
-{
-	static int numIterations = 0;
-	numIterations++;
-	//if the number fits
-	//set the cell with the number that fits
-	//if that number is in position 9,9 then the board is solved
-	//else recursively call this funciton to solve the next element on the board
-	// with (i % 9) + 1 to allow the row to wrap for each column
-	// for the return value of the call if it is true then keep the change else if false then
-	// undue the change and change the conflict variable
-	// Only attempt to test and place a number if the Cell is blank
-	if (isBlank(i, j))
-	{
-		//test every possible element that could go into the Cell
-		for (int l = 1; l <= 9; l++)
-		{
-			// if the current number fits into the cell place the value into that cell, 
-			// The function setCell automatically sets the conflict variables
-			// then after the new number is set, call the solveBoard function recursively
-			// to set the next cell, if the value returned from the next cell is false, which
-			// indicates that there are no numbers that currently work with the next Cell, then clear that cell and 
-			// contiunue with placing elements at that cell from where the function left off. If the testing number gets to 9 and
-			// that number does not work, then return false so that the previous cell can remove its number and try the next
-			if (numberFit(i, j, l))
-			{
-				setCell(i, j, l);
-
-				//system("pause");
-				//print();
-				cout << "Number of Iterations " << numIterations << endl;
-				//cout << " i and j " << i << " " << j << endl;
-				if (i == 9 && j == 9)
-				{
-					return true;
-				}
-				(solveBoard((i % 9) + 1, ((i % 9) + 1 == 1) ? j + 1 : j)) ? true : (clearCell(i, j));
-				
-			}
-		}
-		//return false indicates that there are no numbers that will satisfy the current test numbers
-		return false;
-	}
-	// if the current cell is not blank then call solve Board on the next Cell and this cell
-	// returns whatever it is given
-	else
-	{
-		return solveBoard((i % 9) + 1, ((i % 9) + 1 == 1) ? j + 1 : j);
-
-	}
-}
-	/*
-	for (int l = 1; l < 10; l++)
-	{
-		
-		if (numberFit(i, j, l))
-		{
-			cout << "Value of l " << l << endl;
-			setCell(i, j, l);
-			if (boardSolved())
-			{
-				return true;
-			}
-			else
-			{
-				(solveBoard((i % 9) + 1, j)) ? true : (clearCell(i, j), false);
-			}
-		}
-		
-	}
-	// if no numbers fit then return false
-	return false;
-	
 }*/
 
-// checks for the number of conflicts in a partciular Cell
-// all three arrays must contain that particular number as a conflict in order it to be a conflict for that Cell
-int board::numConflict(const int i, const int j)
-{
-	int conflictNum = 0;
-	for (int l = 1; l < 10; l++)
-	{
-		(rowCheck[i][l] && rowCheck[j][l] && squareCheck[squareNumber(i, j)][l]) ? (conflictNum++, conflictData = l) : conflictNum;
-	}
-	return conflictNum;
-}
+// sets the value of the inputs to the indices of the first empty cell with the most contradictions
 
-// there is only one conflict in this cell then set it to the number 2 which indicates that the number
-// was set because of the fact that there was only one conflict in the cell, so this allows the number to be easily changed back to 
-// blank if the current pattern of numbers is found not to be the solution,
-// Not sure how to indicate which iteration that the number was set so that it sets it self back correctly if the current pattern of numbers
-// is not found to be correct. Need to somehow associate when a particular Cell was set with this function, so that when the function recurses back
-// to a point where that Cell may have other conflicts again, it correctly keeps updates its conflicts
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! not working.....!!!! need to do other things.....
+// and returns true if has found a maximum contradiction cell
+// returns false if a blank cell is a total contradiction (none of the value are valid) or if there are no blank cells
 
-void board::setOneConflict()
-{
-	int numOfConflict = 0;
-	ValueType conflictData = 0;
-	for (int i = 1; i < 10; i++)
+bool board::findMaxContradiction(int &i, int &j)
+{	// initialize i and j to default values
+	i = 0; j = 0;
+	int cmax = 0; // maximum contradictions for the board
+	int cntd = 0; // contradictions for a blank cell
+	// search through all rows and columns
+	for (int r = 1; r <= 9; r++)
 	{
-		for (int j = 1; j < 10; j++)
+		for (int c = 1; c <= 9; c++)
 		{
-			if (numConflict(i, j) == 1)
+			cntd = 0;
+			// if blank, find the number of contradictions
+			if (getCell(r, c) == Blank)
 			{
-				for (int k = 1; k < 10; k++)
+				// find the number of contradictions
+				for (int k = 1; k <= 9; k++)
 				{
-					if (rowCheck[i][k])
-					{
-						conflictData = k;
-					}
+					cntd += (rowCheck[r][k] || columnCheck[c][k] || squareCheck[squareNumber(r, c)][k]);					
+				}				
+				// if this is a higher number of contradictions, use this position, and set the max to this number of contradictions
+				if (cntd>cmax) {
+					i = r; j = c; cmax = cntd; }
+				switch (cntd)
+				{
+				case 8: return true; break; // return cases of a single option remaining immediately
+				case 9: return false; break; // return cases of a total contradiction as no acceptable blank cell found
+				default: break; // all other numbers are acceptable counts that need not disturb the function
 				}
-				setCell(i, j, conflictData);
-			}
-		}
-	}
+			} // if get cell == blank
+		} // for columns
+	} // for rows
+	// after iterating through all of the row and columns, return whether an acceptable cell was found (if so, i & j are both nonzero because they are uninitialized)
+	return (i || j);
 }

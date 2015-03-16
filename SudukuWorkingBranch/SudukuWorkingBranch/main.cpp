@@ -3,12 +3,15 @@
 #include "board.h"
 using namespace std;
 
+int board::numSolveIterations = 0;
+
 int main()
 {
+	int iterSum = 0, puzzleCount = 0;
 	ifstream fin;
 
 	// Read the sample grid from the file.
-	string fileName = "sudoku3.txt";
+	string fileName = "sudoku.txt";
 
 	fin.open(fileName.c_str());
 	if (!fin)
@@ -27,20 +30,24 @@ int main()
 			cout << "Testing a new Board! " << endl;
 			
 			b1.initialize(fin);		
-			system("pause");
+			//system("pause");
 			
 			b1.print();		
-			system("pause");
+			//system("pause");
 			
 			bool finalResult = b1.solveBoard();
-			if(finalResult) { std::cout << "The board was solved!!! " << endl; }
-			else { std::cout << "Unable to solve this board :(" << endl; }
+			cout << "Number of iteratinos " << board::numSolveIterations << endl;
+			iterSum += board::numSolveIterations; puzzleCount++;
+			//if(finalResult) { std::cout << "The board was solved!!! " << endl; }
+			//else { std::cout << "Unable to solve this board :(" << endl; }
 			
 			std::cout << "Result:" << endl;
 			b1.print();
 			
-			system("pause");
+			//system("pause");
 		}
+
+		cout << "All " << puzzleCount << " puzzles attempted in " << board::numSolveIterations << " iterations.\tAverage: " << board::numSolveIterations / puzzleCount << endl;
 	}
 	catch (indexRangeError &ex)
 	{

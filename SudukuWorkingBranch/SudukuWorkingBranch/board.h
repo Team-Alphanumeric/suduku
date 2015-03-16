@@ -50,11 +50,13 @@ public:
 	void setSquareNums();
 	bool numberFit(const int i, const int j, const ValueType testElement);
 	void printConflicts();
-	bool solveBoard(const int i, const int j);
+	bool solveBoard();
 	bool boardSolved();
 	bool findEmpty(int &i, int &j);
+	bool board::findMaxContradiction(int &i, int &j);
 	board();
 	~board();
+	static int numSolveIterations; // number of iterations for the boardSolved function for a puzzle
 
 private:
 
@@ -65,8 +67,8 @@ private:
 	matrix<int> rowCheck; // stores count of each number place in each row: [row][ValueType] 
 	matrix<int> columnCheck; // stores count of each number place in each column: [column][ValueType]
 	matrix<int> squareCheck; // stores count of each number place in each square: [square][ValueType]
-	static int numSolveIterations; // number of iterations for the boardSolved function for a puzzle
+	
 };
 
-numSolveIterations=0;
+
 
