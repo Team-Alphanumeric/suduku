@@ -7,6 +7,7 @@ int board::numSolveIterations = 0;
 
 int main()
 {
+	int boardNumber = 0;
 	int iterSum = 0, puzzleCount = 0;
 	ifstream fin;
 
@@ -28,7 +29,7 @@ int main()
 		while (fin && fin.peek() != 'Z')
 		{	
 			cout << "Testing a new Board! " << endl;
-			
+			boardNumber++;
 			b1.initialize(fin);		
 			//system("pause");
 			
@@ -43,11 +44,10 @@ int main()
 			
 			std::cout << "Result:" << endl;
 			b1.print();
-			
-			//system("pause");
 		}
 
-		cout << "All " << puzzleCount << " puzzles attempted in " << board::numSolveIterations << " iterations.\tAverage: " << board::numSolveIterations / puzzleCount << endl;
+		cout << "All " << puzzleCount << " puzzles attempted in " << iterSum << " iterations.\tAverage: " << iterSum / puzzleCount << endl;
+		system("pause");
 	}
 	catch (indexRangeError &ex)
 	{

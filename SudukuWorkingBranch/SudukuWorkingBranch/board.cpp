@@ -207,7 +207,7 @@ bool board::boardSolved()
 			}
 		}
 	}	
-	if (result) { std::cout << ("The game is not solved.") << endl; }
+	if (result) { std::cout << ("The game is solved!!") << endl; }
 	return result;
 }
 
