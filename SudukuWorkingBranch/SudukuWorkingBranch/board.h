@@ -38,22 +38,16 @@ public:
 	void setCell(const int i,const int j,const ValueType newElement);
 	void clearCell(const int i, const int j);
 	void clear();
-	int numConflict(const int i,const int j);
 	void initialize(ifstream &fin);
 	void print();
 	bool isBlank(int, int);
 	ValueType getCell(int, int);
-	int squareNumber(int i, int j);
-	void setRowNums();
-	void setColumnNums();
-	void setOneConflict();
-	void setSquareNums();
+	int squareNumber(const int i, const int j);
 	bool numberFit(const int i, const int j, const ValueType testElement);
 	void printConflicts();
 	bool solveBoard();
 	bool boardSolved();
-	bool findEmpty(int &i, int &j);
-	bool board::findMaxContradiction(int &i, int &j);
+	bool findMaxContradiction(int &i, int &j);
 	board();
 	~board();
 	static int numSolveIterations; // number of iterations for the boardSolved function for a puzzle

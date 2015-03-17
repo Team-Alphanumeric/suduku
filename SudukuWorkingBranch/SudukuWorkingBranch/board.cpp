@@ -13,9 +13,9 @@ board::~board()
 board::board(int sqSize) : value(BoardSize + 1, BoardSize + 1)
 // Board constructor
 {
-	rowCheck.resize(10,10);
-	columnCheck.resize(10,10);
-	squareCheck.resize(10,10);
+	rowCheck.resize(BoardSize + 1, BoardSize + 1);
+	columnCheck.resize(BoardSize + 1, BoardSize + 1);
+	squareCheck.resize(BoardSize + 1, BoardSize + 1);
 }
 
 /****
@@ -66,6 +66,7 @@ void board::printConflicts()
 }
 /***
 *  takes in a position and a number and sees if there is a conflict at that position
+* returns whether the number can be placed in that cell without contradiction
 ***/
 bool board::numberFit(const int i, const int j, const ValueType testElement)
 {	
@@ -75,13 +76,16 @@ bool board::numberFit(const int i, const int j, const ValueType testElement)
 		   (columnCheck[j][testElement]==0) && (squareCheck[squareNumber(i, j)][testElement]==0);
 }
 
+/****
+* resets the board to all Blank values and reset the contradiction vectors to 0
+***/
 void board::clear()
 {
 	//loop through each element in the table and set all of the value to blank so -1.
 	//Also loop through all the check matrices and clear contradiction vectors.
-	for (int i = 1; i <= BoardSize; i++)
+	for (int i = 1; i <= BoardSize; i++) // for all rows
 	{
-		for (int j = 1; j <= BoardSize; j++)
+		for (int j = 1; j <= BoardSize; j++) //for all columns
 		{
 			//every possible value is set back to true because it is
 			//a blank board so every number can go in every position.
@@ -103,6 +107,8 @@ void board::setCell(const int i, const int j, const ValueType newElement)
 {
 	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
 	{	throw rangeError("In board::setCell: invalid index");	}
+	if (!Blank && ((newElement < MinValue) || (newElement > MaxValue)))
+	{	throw rangeError("In board::setCell: invalid Element value");	}
 	
 	// check if the element should be placed in this position
 	// if not, send a passive-agressive warning message
@@ -192,22 +198,17 @@ void board::initialize(ifstream &fin)
 bool board::boardSolved()
 {
 	bool result = true;
-	for (int r = 1; r < 10; r++)
+	for (int r = 1; r <= BoardSize; r++) // for all rows
 	{
-		for (int c = 1; c < 10; c++)
+		for (int c = 1; c <= BoardSize; c++) // for all columns	
 		{
-			for (int k = 1; k < 10; k++)
+			for (int k = 1; k <= BoardSize; k++) // for all values
 			{
-				/*cout << "Value: " << k;
-				cout << "\tRow: " << rowCheck[r][k];
-				cout << "\tColumn: " << columnCheck[c][k];
-				cout << "\tSquare: " << squareCheck[squareNumber(r, c)][k] << endl;*/
+				// check that the cell is not a blank and has exactly one conflict for each number
 				result = (result) && (value[r][c] != Blank) && (rowCheck[r][k] == 1) && (squareCheck[squareNumber(r,c)][k] == 1) && (columnCheck[c][k] == 1);
-				//if (!result) { cout << "result false at position (" << r << "," << c << ")" << endl; system("pause"); }
 			}
 		}
 	}	
-	if (result) { std::cout << ("The game is solved!!") << endl; }
 	return result;
 }
 
@@ -215,14 +216,16 @@ bool board::boardSolved()
 * SquareNumber takes in the position and determines
 which square that position is in and returns the square number
 ****/
-int board::squareNumber(int i, int j)
+int board::squareNumber(const int i, const int j)
 // Return the square number of cell i,j (counting from left to right,
 // top to bottom.  Note that i and j each go from 1 to BoardSize
 {
 	// Note that (int) i/SquareSize and (int) j/SquareSize are the x-y
 	// coordinates of the square that i,j is in.  
-
-	return SquareSize * ((i - 1) / SquareSize) + (j - 1) / SquareSize + 1;
+	if (i < 1 || i > BoardSize || j < 1 || j > BoardSize)
+	{ throw rangeError("In board::setCell: invalid index"); }
+	else
+	{ return SquareSize * ((i - 1) / SquareSize) + (j - 1) / SquareSize + 1; }
 }
 
 
@@ -335,7 +338,7 @@ bool board::solveBoard()
 	int r, c; if (!findMaxContradiction(r, c)) 
 	{ return boardSolved(); }
 	// otherwise, test all (reasonable) values for this empty cell
-	for (int i = 1; i <= 9; i++)
+	for (int i = 1; i <= BoardSize; i++)
 	{
 		// find (reasonable) test value
 		int test = i; // for now we assume any test number is "reasonable"
@@ -353,92 +356,32 @@ bool board::solveBoard()
 	return false;
 }
 
-
-/*
-// Solves the Board using a brute force method of testing values
-bool board::solveBoard()
-{
-	// increment count of calls to this function for this puzzle
-	numSolveIterations++;
-	cout << "Num of iterations " << numSolveIterations << ".\n";
-	if (numSolveIterations > 250000)
-	{
-		print();
-		system("pause");
-	}
-	
-	
-	// find the first empty cell in the matrix: set to (r,c)
-	// if no empty cells are found, double check if the board is solved
-	// 'boardSolved' here should actually always return true because 
-	// 'numberFit' should ensure noly a valid number is placed
-	int r; int c; if(!findEmpty(r,c)) {return boardSolved(); } 
-	
-	// otherwise, test all (reasonable) values for this empty cell
-	for(int i=1; i<=9; i++)
-	{
-		// find (reasonable) test value
-		int test = i; // for now we assume any test number is "reasonable"
-		
-		// move on to next iteration in the for loop if the test number conflicts
-		if(!numberFit(r,c,test)) { continue; }
-		
-		// input a test value into that cell
-		setCell(r,c,test);
-		
-		// if the board can be solved with that test value, then it is solved (stop searching and return true)
-		if(solveBoard()){ return true; }
-		
-		// otherwise, clear the cell to try with a differnet value
-		clearCell(r,c);
-	}
-	// if still unsolved report unsolvable from here
-	return false;
-}
-
-// sets the value of the inputs to the indices of the first empty cell
-// and returns whether it has found an empty cell
-bool board::findEmpty(int &i, int &j)
-{
-	// search through all rows and columns
-	for(int r=1; r<=9; r++)
-	{
-		for(int c=1; c<=9; c++)
-		{
-			// if blank, set indices to value and quit function
-			if(getCell(r,c)==Blank) {i=r; j=c; return true;}
-		}
-	}
-	// base case: no blank cell found
-	return false;
-}*/
-
-// sets the value of the inputs to the indices of the first empty cell with the most contradictions
-
-// and returns true if has found a maximum contradiction cell
-// returns false if a blank cell is a total contradiction (none of the value are valid) or if there are no blank cells
-
+/*********
+* sets the value of the inputs to the indices of the first empty cell with the most contradictions
+* and returns true if has found a maximum contradiction cell
+* returns false if a blank cell is a total contradiction (none of the value are valid) or if there are no blank cells
+*********/
 bool board::findMaxContradiction(int &i, int &j)
 {	// initialize i and j to default values
 	i = 0; j = 0;
 	int cmax = 0; // maximum contradictions for the board
 	int cntd = 0; // contradictions for a blank cell
 	// search through all rows and columns
-	for (int r = 1; r <= 9; r++)
+	for (int r = 1; r <= BoardSize; r++)
 	{
-		for (int c = 1; c <= 9; c++)
+		for (int c = 1; c <= BoardSize; c++)
 		{
 			cntd = 0;
 			// if blank, find the number of contradictions
 			if (getCell(r, c) == Blank)
 			{
 				// find the number of contradictions
-				for (int k = 1; k <= 9; k++)
+				for (int k = 1; k <= BoardSize; k++)
 				{
 					cntd += (rowCheck[r][k] || columnCheck[c][k] || squareCheck[squareNumber(r, c)][k]);					
 				}				
 				// if this is a higher number of contradictions, use this position, and set the max to this number of contradictions
-				if (cntd>cmax) {
+				if (cntd>=cmax) {
 					i = r; j = c; cmax = cntd; }
 				switch (cntd)
 				{

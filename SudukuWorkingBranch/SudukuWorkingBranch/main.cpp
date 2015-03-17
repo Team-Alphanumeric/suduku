@@ -1,3 +1,7 @@
+// Sudoku Written by 
+// Alex Agudelo && Thurston Brevett
+
+
 #include <iostream>
 #include <fstream>
 #include "board.h"
@@ -28,19 +32,14 @@ int main()
 
 		while (fin && fin.peek() != 'Z')
 		{	
-			cout << "Testing a new Board! " << endl;
-			boardNumber++;
-			b1.initialize(fin);		
-			//system("pause");
-			
-			b1.print();		
-			//system("pause");
+			cout << "Testing board number " << ++boardNumber << endl;
+			b1.initialize(fin);			
+			b1.print();
 			
 			bool finalResult = b1.solveBoard();
-			cout << "Number of iteratinos " << board::numSolveIterations << endl;
-			iterSum += board::numSolveIterations; puzzleCount++;
-			//if(finalResult) { std::cout << "The board was solved!!! " << endl; }
-			//else { std::cout << "Unable to solve this board :(" << endl; }
+			cout << "Number of iterations " << board::numSolveIterations << endl;
+			iterSum += board::numSolveIterations; 
+			puzzleCount++;
 			
 			std::cout << "Result:" << endl;
 			b1.print();
